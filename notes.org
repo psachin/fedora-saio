@@ -1,0 +1,7 @@
+* Notes
+** Setup
+   - Install virtualbox additions
+     - dnf install kernel-devel gcc make
+     - mount /dev/sr0 /mnt/iso
+       - cd /mnt/iso/
+       - ./VBoxLinuxAdditions.run
