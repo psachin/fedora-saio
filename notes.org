@@ -5,3 +5,11 @@
      - mount /dev/sr0 /mnt/iso
        - cd /mnt/iso/
        - ./VBoxLinuxAdditions.run
+
+** install
+
+# gem install childprocess
+# gem install vagrant-libvirt
+# vagrant plugin install libvirt
+
+

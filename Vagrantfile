@@ -6,7 +6,7 @@
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
 
-DEFAULT_BOX = "fedora-saio"
+DEFAULT_BOX = "fedoraSaio"
 
 vagrant_boxes = {
   DEFAULT_BOX => "https://download.fedoraproject.org/pub/fedora/linux/releases/23/Cloud/x86_64/Images/Fedora-Cloud-Base-Vagrant-23-20151030.x86_64.vagrant-virtualbox.box",
@@ -51,13 +51,23 @@ Vagrant.configure(2) do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
-  config.vm.box = "fedora/23-cloud-base"
-  config.vm.hostname = "saio"
-  config.vm.box_url = vagrant_boxes[vagrant_box]
+  config.vm.define :fedoraSaio do |fedoraSaio|
+    fedoraSaio.vm.box = "fedora/24-cloud-base"
+    fedoraSaio.vm.hostname = "saio"
+    fedoraSaio.vm.box_check_update = true
+
+    fedoraSaio.vm.network :private_network,
+                          :ip => "192.168.11.33",
+                          :libvirt__network_name => "dev-net",
+                          :management_network_name => "vagrant-libvirt",
+                          :management_network_address => "192.168.121.0/24",
+                          :management_network_mode => "nat",
+                          :model_type => "virtio"
+  end
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
   # `vagrant box outdated`. This is not recommended.
-  config.vm.box_check_update = false
+
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
@@ -66,7 +76,7 @@ Vagrant.configure(2) do |config|
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
-  config.vm.network "private_network", ip: "192.168.33.11"
+
 
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
@@ -77,20 +87,24 @@ Vagrant.configure(2) do |config|
   # the path on the host to the actual folder. The second argument is
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
-  # config.vm.synced_folder "../data", "/vagrant_data"
+  # config.vm.synced_folder "cookbooks/swift/files/default/etc", "/etc", type: "nfs", create: true, nfs_udp: false
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
   # Example for VirtualBox:
   #
-  config.vm.provider "virtualbox" do |vb|
-    # Display the VirtualBox GUI when booting the machine
-    vb.gui = false
-
+  config.vm.provider "libvirt" do |libvirt|
     # Customize the amount of memory on the VM:
-    vb.cpus = 1
-    vb.memory = "1024"
+    libvirt.driver = "kvm"
+    libvirt.cpus = 1
+    libvirt.memory = 1024
+    libvirt.nested = true
+
+    # libvirt.storage :file,
+    #                 :size => "2G",
+    #                 :path => "fedora-saio.qcow2"
   end
+
   #
   # View the documentation for the provider you are using for more
   # information on available options.
@@ -106,13 +120,17 @@ Vagrant.configure(2) do |config|
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
 
-  config.vm.provision :shell, :inline => "curl -L https://www.opscode.com/chef/install.sh | sudo bash"
+  # config.vm.provision :shell, :inline => "curl -L https://www.opscode.com/chef/install.sh | sudo bash"
 
-  config.vm.provision :chef_solo do |chef|
-    # chef.channel = "current"
-    chef.cookbooks_path = ["cookbooks"]
-    chef.add_recipe("swift")
-    chef.json = local_config
-    # chef.node_name = "saio"
-  end
+  # config.vm.provision :chef_solo do |chef|
+  #   # chef.channel = "current"
+  #   chef.cookbooks_path = ["cookbooks"]
+  #   # chef.add_recipe("swift")
+  #   # chef.json = local_config
+  #   # chef.node_name = "saio"
+  # end
+
+  config.vm.provision :shell,
+                      path: "setup.sh"
+
 end
