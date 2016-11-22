@@ -1,6 +1,6 @@
 * fedora-saio
 
-  Swift All In One on Fedora(libvirt provider)
+  Swift All In One on Fedora(Vagrant =libvirt= provider)
 
 ** Install dependencies
 
@@ -8,8 +8,9 @@
      sudo dnf install vagrant-libvirt
      sudo dnf install @vagrant
 
-     # Make sure you enable libvirt daemon
+     # Make sure to enable libvirt daemon
      sudo systemctl enable libvirtd
+     sudo systemctl start libvirtd
    #+END_SRC
 
 ** Provision
@@ -17,6 +18,21 @@
    #+BEGIN_SRC sh
      vagrant up --provision
    #+END_SRC
+
+   SSH to domain
+   #+BEGIN_SRC sh
+     vagrant ssh
+   #+END_SRC
+
+** Start swift
+
+   Initialize swift if not started(Optional)
+   #+BEGIN_SRC sh
+     cd ~/bin
+     sudo bash startmain
+   #+END_SRC
+
+   Swift proxy server should be running at =192.168.11.33:8080=
 
 ** Reference
 

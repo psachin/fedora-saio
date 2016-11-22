@@ -9,7 +9,9 @@ dnf install -y fedora-packager \
 	python-d2to1 \
 	python-oslo-sphinx \
 	python-pbr \
-	python-sphinx
+	python-sphinx \
+	langpacks-en
+
 
 dnf install -y emacs-nox \
 	rsyslog \
@@ -52,9 +54,18 @@ mkdir /srv
 truncate -s 1GB /srv/swift-disk
 mkfs.xfs /srv/swift-disk
 
+
+if grep -e "^\/srv/swift-disk" /etc/fstab > /dev/null;
+then
+    echo "Not modifying /etc/fstab"
+else
+
 cat <<EOF >>/etc/fstab
 /srv/swift-disk /mnt/sdb1 xfs loop,noatime,nodiratime,nobarrier,logbufs=8 0 0
 EOF
+
+fi
+
 
 mkdir /mnt/sdb1
 mount /mnt/sdb1
@@ -78,6 +89,7 @@ mkdir -p /var/cache/swift /var/cache/swift2 /var/cache/swift3 /var/cache/swift4
 chown vagrant:vagrant /var/cache/swift*
 mkdir -p /var/run/swift
 chown vagrant:vagrant /var/run/swift
+/bin/swift-init start main
 EOF
 
 
@@ -119,23 +131,51 @@ mkdir -p /home/vagrant/bin
 cp -rv /home/vagrant/swift/doc/saio/bin/* /home/vagrant/bin
 chmod +x /home/vagrant/bin/*
 
-cat <<EOF >>/home/vagrant/.bashrc
+if grep -e "export SAIO_BLOCK_DEVICE=/srv/swift-disk" /home/vagrant/.bashrc > /dev/null;
+then
+    echo "Not modifying .bashrc"
+else
+
+cat <<EOF >> /home/vagrant/.bashrc
 export SAIO_BLOCK_DEVICE=/srv/swift-disk
 EOF
 
-cat <<EOF >>/home/vagrant/.bashrc
+fi
+
+if grep -e "export SWIFT_TEST_CONFIG_FILE=/etc/swift/test.conf" /home/vagrant/.bashrc > /dev/null;
+then
+    echo "Not modifying .bashrc"
+else
+
+cat <<EOF >> /home/vagrant/.bashrc
 export SWIFT_TEST_CONFIG_FILE=/etc/swift/test.conf
 EOF
 
-cat <<EOF >>/home/vagrant/.bashrc
+fi
+
+if grep -e "export PATH=${PATH}:/home/vagrant/bin" /home/vagrant/.bashrc > /dev/null;
+then
+    echo "Not modifying .bashrc"
+else
+
+cat <<EOF >> /home/vagrant/.bashrc
 export PATH=${PATH}:/home/vagrant/bin
 EOF
 
-cat <<EOF >>/home/vagrant/.bashrc
+fi
+
+if grep -e "export ST_AUTH=http://192.168.11.33:8080/auth/v1.0" /home/vagrant/.bashrc > /dev/null;
+then
+    echo "Not modifying .bashrc"
+else
+
+cat <<EOF >> /home/vagrant/.bashrc
 export ST_AUTH=http://192.168.11.33:8080/auth/v1.0
 export ST_USER=test:tester
 export ST_KEY=testing
 EOF
+
+fi
 
 sh /home/vagrant/bin/remakerings
 sh /home/vagrant/bin/startmain
