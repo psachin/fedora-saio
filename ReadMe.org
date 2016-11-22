@@ -1,0 +1,39 @@
+* fedora-saio
+
+  Swift All In One on Fedora(libvirt provider)
+
+** Install dependencies
+
+   #+BEGIN_SRC sh
+     sudo dnf install vagrant-libvirt
+     sudo dnf install @vagrant
+
+     # Make sure you enable libvirt daemon
+     sudo systemctl enable libvirtd
+   #+END_SRC
+
+** Provision
+
+   #+BEGIN_SRC sh
+     vagrant up --provision
+   #+END_SRC
+
+** Reference
+
+   - [[https://developer.fedoraproject.org/tools/vagrant/vagrant-libvirt.html]]
+   - [[http://docs.openstack.org/developer/swift/development_saio.html]]
+   - [[https://github.com/vagrant-libvirt/vagrant-libvirt]]
+
+** Additional info(Skip this section)
+   - Install virtualbox additions
+     - dnf install kernel-devel gcc make
+     - mount /dev/sr0 /mnt/iso
+       - cd /mnt/iso/
+       - ./VBoxLinuxAdditions.run
+
+
+   #+BEGIN_SRC sh
+     gem install childprocess
+     gem install vagrant-libvirt
+     vagrant plugin install libvirt
+   #+END_SRC

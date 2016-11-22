@@ -88,7 +88,7 @@ popd
 
 
 pushd /home/vagrant; git clone https://github.com/openstack/swift.git
-pushd swift; pip install -r requirements.txt; python setup.py develop; cd -
+pushd swift; pip install -r requirements.txt; python setup.py develop
 popd
 popd
 
