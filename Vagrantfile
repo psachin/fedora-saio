@@ -87,7 +87,7 @@ Vagrant.configure(2) do |config|
   # the path on the host to the actual folder. The second argument is
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
-  # config.vm.synced_folder "cookbooks/swift/files/default/etc", "/etc", type: "nfs", create: true, nfs_udp: false
+  # config.vm.synced_folder "./cookbooks/swift/files/default/etc", "/etc", type: "rsync"
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
@@ -96,13 +96,13 @@ Vagrant.configure(2) do |config|
   config.vm.provider "libvirt" do |libvirt|
     # Customize the amount of memory on the VM:
     libvirt.driver = "kvm"
-    libvirt.cpus = 1
-    libvirt.memory = 1024
+    libvirt.cpus = 2
+    libvirt.memory = 8192
     libvirt.nested = true
 
-    # libvirt.storage :file,
-    #                 :size => "2G",
-    #                 :path => "fedora-saio.qcow2"
+    libvirt.storage :file,
+                    :size => '2G',
+                    :path => 'saio-disk2.qcow2'
   end
 
   #
@@ -131,6 +131,16 @@ Vagrant.configure(2) do |config|
   # end
 
   config.vm.provision :shell,
-                      path: "setup.sh"
+                      path: "install_packages.sh"
+  config.vm.provision :shell,
+                      path: "prepare_disk.sh"
+  config.vm.provision :shell,
+                      path: "copy_configs.sh"
+  config.vm.provision :shell,
+                      path: "sync_repos.sh"
+  config.vm.provision :shell,
+                      path: "remakerings.sh"
+  config.vm.provision :shell,
+                      path: "services.sh"
 
 end
