@@ -38,7 +38,7 @@ swift-ring-builder container.builder rebalance
 swift-ring-builder account.builder create 10 5 1
 for i in {1..10};
 do
-	swift-ring-builder account.builder add r1z1-127.0.0.1:6012/{i} 1
+	swift-ring-builder account.builder add r1z1-127.0.0.1:6012/${i} 1
 done
 swift-ring-builder account.builder rebalance
 
