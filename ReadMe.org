@@ -2,6 +2,8 @@
 
   Swift All In One on Fedora(Vagrant =libvirt= provider)
 
+  Deployment screencast: [[https://asciinema.org/a/94335][https://asciinema.org/a/94335]]
+
 ** Install dependencies
 
    #+BEGIN_SRC sh
