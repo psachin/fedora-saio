@@ -37,18 +37,27 @@ mkdir /mnt/sdb2
 mount /mnt/sdb1
 mount /mnt/sdb2
 
-mkdir /mnt/sdb1/1 /mnt/sdb1/2 /mnt/sdb1/3 /mnt/sdb1/4
-mkdir /mnt/sdb2/5 /mnt/sdb2/6 /mnt/sdb2/7 /mnt/sdb2/8 /mnt/sdb2/9 /mnt/sdb2/10
+for i in {1..4};
+do
+	mkdir /mnt/sdb1/${i}
+done
+
+for i in {5..10};
+do
+	mkdir /mnt/sdb2/${i}
+done
 
 chown vagrant:vagrant /mnt/sdb1/*
 chown vagrant:vagrant /mnt/sdb2/*
 
 for x in {1..4};
-do ln -s /mnt/sdb1/$x /srv/node/$x;
+do
+	ln -s /mnt/sdb1/$x /srv/node/$x;
 done
 
 for y in {5..10};
-do ln -s /mnt/sdb2/$y /srv/node/$y;
+do
+	ln -s /mnt/sdb2/$y /srv/node/$y;
 done
 
 mkdir -p /var/cache/swift
