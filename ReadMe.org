@@ -5,40 +5,74 @@
 ** Install dependencies
 
    #+BEGIN_SRC sh
-     sudo dnf install vagrant-libvirt
-     sudo dnf install @vagrant
+     $ sudo dnf install vagrant-libvirt
+     $ sudo dnf install @vagrant
 
      # Make sure to enable libvirt daemon
-     sudo systemctl enable libvirtd
-     sudo systemctl start libvirtd
+     $ sudo systemctl enable libvirtd
+     $ sudo systemctl start libvirtd
    #+END_SRC
 
 ** Provision
 
-   #+BEGIN_SRC sh
-     vagrant up --provision
-   #+END_SRC
+   - Create additional disk
+	 #+BEGIN_SRC sh
+       # cd /var/lib/libvirt/images
+       # qemu-img create -f qcow2 saio-disk2.qcow2 2G
+	 #+END_SRC
 
-   SSH to domain
-   #+BEGIN_SRC sh
-     vagrant ssh
-   #+END_SRC
+   - Start domain
+	 #+BEGIN_SRC sh
+       $ vagrant up --provision
+     #+END_SRC
+
+   - SSH to fedoraSaio domain
+     #+BEGIN_SRC sh
+       $ vagrant ssh
+     #+END_SRC
 
 ** Start swift
 
-   Initialize swift if not started(Optional)
-   #+BEGIN_SRC sh
-     cd ~/bin
-     sudo bash startmain
-   #+END_SRC
+   - Initialize swift object, container & account server
+	 #+BEGIN_SRC sh
+       $ sudo swift-init main start
+     #+END_SRC
+
+   - Start other server namely =updater=, =replication=, =auditor=
+	 #+BEGIN_SRC sh
+       $ sudo swift-init rest start;
+	 #+END_SRC
 
    Swift proxy server should be running at =192.168.11.33:8080=
+
+** Dispersion report
+
+   - In order to dispersion report, run
+
+	 #+BEGIN_SRC sh
+       $ swift-dispersion-populate
+	 #+END_SRC
+
+   - Sample output
+
+	 #+BEGIN_SRC sh
+       $ swift-dispersion-report
+       Using storage policy: gold
+       Queried 10 containers for dispersion reporting, 0s, 0 retries
+       100.00% of container copies found (50 of 50)
+       Sample represents 0.98% of the container partition space
+       Queried 10 objects for dispersion reporting, 0s, 0 retries
+       There were 10 partitions missing 0 copies.
+       100.00% of object copies found (30 of 30)
+       Sample represents 0.98% of the object partition space
+	 #+END_SRC
 
 ** Reference
 
    - [[https://developer.fedoraproject.org/tools/vagrant/vagrant-libvirt.html]]
    - [[http://docs.openstack.org/developer/swift/development_saio.html]]
    - [[https://github.com/vagrant-libvirt/vagrant-libvirt]]
+   - Supported =ec_type=: [[https://bitbucket.org/kmgreen2/pyeclib]]
 
 ** Additional info(Skip this section)
    - Install virtualbox additions
@@ -52,4 +86,5 @@
      gem install childprocess
      gem install vagrant-libvirt
      vagrant plugin install libvirt
+	 virsh pool-refresh default
    #+END_SRC
