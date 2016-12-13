@@ -97,7 +97,7 @@ Vagrant.configure(2) do |config|
     # Customize the amount of memory on the VM:
     libvirt.driver = "kvm"
     libvirt.cpus = 2
-    libvirt.memory = 8192
+    libvirt.memory = 4096
     libvirt.nested = true
 
     libvirt.storage :file,

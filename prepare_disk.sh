@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 
+# mkfs.xfs -f -L d1 /dev/sdb
+# mkfs.xfs -f -L d2 /dev/sdc
+
+# mkdir -p /srv/node/d1
+# mkdir -p /srv/node/d2
+
+# mount -t xfs -o noatime,nodiratime,logbufs=8 -L d1 /srv/node/d1
+# mount -t xfs -o noatime,nodiratime,logbufs=8 -L d2 /srv/node/d2
+
 mkdir /srv/node
 truncate -s 1GB /srv/swift-disk
 mkfs.xfs /srv/swift-disk
@@ -39,12 +48,12 @@ mount /mnt/sdb2
 
 for i in {1..4};
 do
-	mkdir /mnt/sdb1/${i}
+	mkdir /mnt/sdb1/d${i}
 done
 
 for i in {5..10};
 do
-	mkdir /mnt/sdb2/${i}
+	mkdir /mnt/sdb2/d${i}
 done
 
 chown vagrant:vagrant /mnt/sdb1/*
@@ -52,12 +61,12 @@ chown vagrant:vagrant /mnt/sdb2/*
 
 for x in {1..4};
 do
-	ln -s /mnt/sdb1/$x /srv/node/$x;
+	ln -s /mnt/sdb1/d$x /srv/node/d$x;
 done
 
 for y in {5..10};
 do
-	ln -s /mnt/sdb2/$y /srv/node/$y;
+	ln -s /mnt/sdb2/d$y /srv/node/d$y;
 done
 
 mkdir -p /var/cache/swift
@@ -71,4 +80,4 @@ chown -R root:adm /var/log/swift
 chmod -R g+w /var/log/swift
 
 # **Make sure to include the trailing slash after /srv/node/$x/**
-for x in {1..10}; do chown -R vagrant:vagrant /srv/node/$x/; done
+for x in {1..10}; do chown -R vagrant:vagrant /srv/node/d$x/; done
