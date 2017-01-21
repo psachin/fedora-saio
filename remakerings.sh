@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # 10 nodes
-# 3 replicas -> 4 nodes/1,2,3,4
-# 6 replicas -> 6 nodes/5,6,7,8,9,10
+## 3 replicas -> 4 nodes/1,2,3,4
+## 6 replicas -> 6 nodes/5,6,7,8,9,10
 
 set -e
 

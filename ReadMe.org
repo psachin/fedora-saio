@@ -7,28 +7,31 @@
 ** Install dependencies
 
    #+BEGIN_SRC sh
-     $ sudo dnf install vagrant-libvirt
+     # Install vagrant-libvirt dependency packages
      $ sudo dnf install @vagrant
+     $ sudo dnf install vagrant-libvirt
 
-     # Make sure to enable libvirt daemon
+     # Make sure you enable libvirt daemon
      $ sudo systemctl enable libvirtd
      $ sudo systemctl start libvirtd
+
+     # Make sure you enable virtlogd daemon
+     $ sudo systemctl enable virtlogd
+     $ sudo systemctl start virtlogd
+   #+END_SRC
+
+** Add user to =libvirt= group
+
+   #+BEGIN_SRC sh
+     $ sudo usermod -G libvirt -a <USERNAME>
    #+END_SRC
 
 ** Provision
 
-   - Create additional disk
-
-	 #+BEGIN_SRC sh
-       sudo -s
-       cd /var/lib/libvirt/images
-       qemu-img create -f qcow2 saio-disk2.qcow2 2G
-	 #+END_SRC
-
    - Start domain
 
 	 #+BEGIN_SRC sh
-       vagrant up --provision
+       vagrant up
      #+END_SRC
 
    - SSH to fedoraSaio domain
@@ -51,7 +54,7 @@
 
    Swift proxy server should be running at =192.168.11.33:8080=
 
-** Dispersion report
+*** Dispersion report
 
    - In order to dispersion report, run
 
@@ -73,24 +76,13 @@
        Sample represents 0.98% of the object partition space
 	 #+END_SRC
 
+** Troubleshooting
+
+   - You may need to change =:adapter= value in =Vagrantfile=
+
 ** Reference
 
    - [[https://developer.fedoraproject.org/tools/vagrant/vagrant-libvirt.html]]
    - [[http://docs.openstack.org/developer/swift/development_saio.html]]
    - [[https://github.com/vagrant-libvirt/vagrant-libvirt]]
    - Supported =ec_type=: [[https://bitbucket.org/kmgreen2/pyeclib]]
-
-** Additional info(Skip this section)
-   - Install virtualbox additions
-     - dnf install kernel-devel gcc make
-     - mount /dev/sr0 /mnt/iso
-       - cd /mnt/iso/
-       - ./VBoxLinuxAdditions.run
-
-
-   #+BEGIN_SRC sh
-     gem install childprocess
-     gem install vagrant-libvirt
-     vagrant plugin install libvirt
-	 virsh pool-refresh default
-   #+END_SRC
