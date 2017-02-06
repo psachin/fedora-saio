@@ -6,7 +6,39 @@
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
 
+# Not used
 DEFAULT_BOX = "fedoraSaio"
+
+boxes = [
+  {
+    :name => "proxy1",
+    :eth1 => "192.168.100.33",
+    :eth2 => "192.168.200.33",
+    :mem => 512,
+    :cpu => 1
+  },
+  {
+    :name => "object1",
+    :eth1 => "192.168.100.20",
+    :eth2 => "192.168.200.20",
+    :mem => 512,
+    :cpu => 1
+  },
+  {
+    :name => "object2",
+    :eth1 => "192.168.100.21",
+    :eth2 => "192.168.200.21",
+    :mem => 512,
+    :cpu => 1
+  },
+  {
+    :name => "object3",
+    :eth1 => "192.168.100.22",
+    :eth2 => "192.168.200.22",
+    :mem => 512,
+    :cpu => 1
+  }
+]
 
 Vagrant.configure(2) do |config|
   # The most common configuration options are documented and commented below.
@@ -15,18 +47,42 @@ Vagrant.configure(2) do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
-  config.vm.define :fedoraSaio do |fedoraSaio|
-    fedoraSaio.vm.box = "fedora/24-cloud-base"
-    fedoraSaio.vm.hostname = "saio"
-    fedoraSaio.vm.box_check_update = true
+  boxes.each do |box|
+    config.vm.define box[:name] do |fedoraSaio|
+      fedoraSaio.vm.box = "fedora/24-cloud-base"
+      fedoraSaio.vm.hostname = box[:name]
+      fedoraSaio.vm.box_check_update = true
 
-    fedoraSaio.vm.network :private_network,
-                          :ip => "192.168.11.33",
-                          :libvirt__network_name => "dev-net",
-                          :management_network_name => "vagrant-libvirt",
-                          :management_network_address => "192.168.121.0/24",
-                          :management_network_mode => "nat",
-                          :model_type => "virtio"
+      fedoraSaio.vm.network :private_network,
+                            :ip => box[:eth1],
+                            :libvirt__network_name => "dev-net",
+                            :management_network_name => "external",
+                            :management_network_address => "192.168.100.0/24",
+                            :management_network_mode => "nat",
+                            :model_type => "virtio"
+
+      fedoraSaio.vm.network :private_network,
+                            :ip => box[:eth2],
+                            :libvirt__network_name => "dev-net",
+                            :management_network_name => "internal",
+                            :management_network_address => "192.168.200.0/24",
+                            :management_network_mode => "nat",
+                            :model_type => "virtio"
+
+      fedoraSaio.vm.provider "libvirt" do |libvirt|
+        # Customize the amount of memory on the VM:
+        libvirt.autostart = true
+        libvirt.uri = 'qemu+unix:///system'
+        libvirt.driver = "kvm"
+        libvirt.cpus = box[:cpu]
+        libvirt.memory = box[:mem]
+        libvirt.nested = true
+
+        # libvirt.storage :file,
+        #             :size => '2G',
+        #             :path => 'saio-disk2.qcow2'
+      end
+    end
   end
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -36,11 +92,12 @@ Vagrant.configure(2) do |config|
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
-  config.vm.network :forwarded_port,
-                    :guest => 22,
-                    :host => 2222,
-                    :adapter => "eth0",
-                    :host_ip => "*"
+
+  # config.vm.network :forwarded_port,
+  #                   :guest => 22,
+  #                   :host => 2222,
+  #                   :adapter => "eth0",
+  #                   :host_ip => "*"
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
@@ -61,19 +118,19 @@ Vagrant.configure(2) do |config|
   # backing providers for Vagrant. These expose provider-specific options.
   # Example for VirtualBox:
   #
-  config.vm.provider "libvirt" do |libvirt|
-    # Customize the amount of memory on the VM:
-    libvirt.autostart = true
-    libvirt.uri = 'qemu+unix:///system'
-    libvirt.driver = "kvm"
-    libvirt.cpus = 2
-    libvirt.memory = 4096
-    libvirt.nested = true
+  # config.vm.provider "libvirt" do |libvirt|
+  #   # Customize the amount of memory on the VM:
+  #   libvirt.autostart = true
+  #   libvirt.uri = 'qemu+unix:///system'
+  #   libvirt.driver = "kvm"
+  #   libvirt.cpus = 2
+  #   libvirt.memory = 4096
+  #   libvirt.nested = true
 
-    libvirt.storage :file,
-                    :size => '2G',
-                    :path => 'saio-disk2.qcow2'
-  end
+  #   libvirt.storage :file,
+  #                   :size => '2G',
+  #                   :path => 'saio-disk2.qcow2'
+  # end
 
   #
   # View the documentation for the provider you are using for more
@@ -90,17 +147,17 @@ Vagrant.configure(2) do |config|
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
 
-  config.vm.provision :shell,
-                      path: "install_packages.sh"
-  config.vm.provision :shell,
-                      path: "prepare_disk.sh"
-  config.vm.provision :shell,
-                      path: "copy_configs.sh"
-  config.vm.provision :shell,
-                      path: "sync_repos.sh"
-  config.vm.provision :shell,
-                      path: "remakerings.sh"
-  config.vm.provision :shell,
-                      path: "services.sh"
+  # config.vm.provision :shell,
+  #                     path: "install_packages.sh"
+  # config.vm.provision :shell,
+  #                     path: "prepare_disk.sh"
+  # config.vm.provision :shell,
+  #                     path: "copy_configs.sh"
+  # config.vm.provision :shell,
+  #                     path: "sync_repos.sh"
+  # config.vm.provision :shell,
+  #                     path: "remakerings.sh"
+  # config.vm.provision :shell,
+  #                     path: "services.sh"
 
 end
