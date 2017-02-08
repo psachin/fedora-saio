@@ -7,34 +7,30 @@
 # you're doing.
 
 # Not used
-DEFAULT_BOX = "fedoraSaio"
+DEFAULT_BOX = "fedoraSwift"
 
 boxes = [
   {
     :name => "proxy1",
     :eth1 => "192.168.100.33",
-    :eth2 => "192.168.200.33",
     :mem => 512,
     :cpu => 1
   },
   {
     :name => "object1",
     :eth1 => "192.168.100.20",
-    :eth2 => "192.168.200.20",
     :mem => 512,
     :cpu => 1
   },
   {
     :name => "object2",
     :eth1 => "192.168.100.21",
-    :eth2 => "192.168.200.21",
     :mem => 512,
     :cpu => 1
   },
   {
     :name => "object3",
     :eth1 => "192.168.100.22",
-    :eth2 => "192.168.200.22",
     :mem => 512,
     :cpu => 1
   }
@@ -48,28 +44,20 @@ Vagrant.configure(2) do |config|
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
   boxes.each do |box|
-    config.vm.define box[:name] do |fedoraSaio|
-      fedoraSaio.vm.box = "fedora/24-cloud-base"
-      fedoraSaio.vm.hostname = box[:name]
-      fedoraSaio.vm.box_check_update = true
+    config.vm.define box[:name] do |fedora|
+      fedora.vm.box = "fedora/25-cloud-base"
+      fedora.vm.hostname = box[:name]
+      fedora.vm.box_check_update = true
 
-      fedoraSaio.vm.network :private_network,
-                            :ip => box[:eth1],
-                            :libvirt__network_name => "dev-net",
-                            :management_network_name => "external",
-                            :management_network_address => "192.168.100.0/24",
-                            :management_network_mode => "nat",
-                            :model_type => "virtio"
+      fedora.vm.network :private_network,
+                        :ip => box[:eth1],
+                        :libvirt__network_name => "swift-cluster-int",
+                        :management_network_name => "replication",
+                        :management_network_address => "192.168.100.0/24",
+                        :management_network_mode => "nat",
+                        :model_type => "virtio"
 
-      fedoraSaio.vm.network :private_network,
-                            :ip => box[:eth2],
-                            :libvirt__network_name => "dev-net",
-                            :management_network_name => "internal",
-                            :management_network_address => "192.168.200.0/24",
-                            :management_network_mode => "nat",
-                            :model_type => "virtio"
-
-      fedoraSaio.vm.provider "libvirt" do |libvirt|
+      fedora.vm.provider "libvirt" do |libvirt|
         # Customize the amount of memory on the VM:
         libvirt.autostart = true
         libvirt.uri = 'qemu+unix:///system'
@@ -77,10 +65,13 @@ Vagrant.configure(2) do |config|
         libvirt.cpus = box[:cpu]
         libvirt.memory = box[:mem]
         libvirt.nested = true
+        # libvirt.storage_pool_name = "swift-cluster-pool"
 
-        # libvirt.storage :file,
-        #             :size => '2G',
-        #             :path => 'saio-disk2.qcow2'
+        if /object/ === box[:name]
+          libvirt.storage :file,
+                          :size => '2G',
+                          :path => "swift-cluster-disk-#{box[:name]}.qcow2"
+        end
       end
     end
   end
@@ -118,20 +109,6 @@ Vagrant.configure(2) do |config|
   # backing providers for Vagrant. These expose provider-specific options.
   # Example for VirtualBox:
   #
-  # config.vm.provider "libvirt" do |libvirt|
-  #   # Customize the amount of memory on the VM:
-  #   libvirt.autostart = true
-  #   libvirt.uri = 'qemu+unix:///system'
-  #   libvirt.driver = "kvm"
-  #   libvirt.cpus = 2
-  #   libvirt.memory = 4096
-  #   libvirt.nested = true
-
-  #   libvirt.storage :file,
-  #                   :size => '2G',
-  #                   :path => 'saio-disk2.qcow2'
-  # end
-
   #
   # View the documentation for the provider you are using for more
   # information on available options.
@@ -147,17 +124,17 @@ Vagrant.configure(2) do |config|
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
 
-  # config.vm.provision :shell,
-  #                     path: "install_packages.sh"
+  config.vm.provision :shell,
+                      path: "install_packages.sh"
   # config.vm.provision :shell,
   #                     path: "prepare_disk.sh"
-  # config.vm.provision :shell,
-  #                     path: "copy_configs.sh"
-  # config.vm.provision :shell,
-  #                     path: "sync_repos.sh"
+  config.vm.provision :shell,
+                      path: "copy_configs.sh"
+  config.vm.provision :shell,
+                      path: "sync_repos.sh"
   # config.vm.provision :shell,
   #                     path: "remakerings.sh"
-  # config.vm.provision :shell,
-  #                     path: "services.sh"
+  config.vm.provision :shell,
+                      path: "services.sh"
 
 end
