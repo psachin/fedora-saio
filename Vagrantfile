@@ -16,7 +16,7 @@ Vagrant.configure(2) do |config|
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
   config.vm.define :fedoraSaio do |fedoraSaio|
-    fedoraSaio.vm.box = "fedora/24-cloud-base"
+    fedoraSaio.vm.box = "fedora/25-cloud-base"
     fedoraSaio.vm.hostname = "saio"
     fedoraSaio.vm.box_check_update = true
 
@@ -37,9 +37,10 @@ Vagrant.configure(2) do |config|
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
   config.vm.network :forwarded_port,
+                    :id => 'ssh',
                     :guest => 22,
                     :host => 2222,
-                    :adapter => "eth0",
+                    :adapter => "eno1",
                     :host_ip => "*"
 
   # Create a private network, which allows host-only access to the machine
