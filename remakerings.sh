@@ -15,6 +15,7 @@ swift-ring-builder object.builder create 10 3 1
 swift-ring-builder object-1.builder create 10 3 1
 for i in {1..4};
 do
+	# swift-ring-builder object.builder add --region 1 --zone 1 --ip 127.0.0.1 --port 6010 -d d${i} -w 1
 	swift-ring-builder object.builder add r1z1-127.0.0.1:6010/d${i} 1
 	swift-ring-builder object-1.builder add r1z1-127.0.0.1:6010/d${i} 1
 done

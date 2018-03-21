@@ -86,3 +86,8 @@
    - [[http://docs.openstack.org/developer/swift/development_saio.html]]
    - [[https://github.com/vagrant-libvirt/vagrant-libvirt]]
    - Supported =ec_type=: [[https://bitbucket.org/kmgreen2/pyeclib]]
+
+
+** Multi-cluster
+   - Both swift proxy services and memcached services should be
+     running on proxy server node
